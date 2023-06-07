@@ -1,0 +1,8 @@
+<div class="{{ item.orientation == 'Image Right' ? 'flex-row-reverse' : '' }}">
+  <img src="{{ Image(item.image).src() }}" alt="{{ Image(item.image).alt }}">
+  <div>
+    <h3>{{ item.title }}</h3>
+    {{ item.description ? '<p>' ~ item.description ~ '</p>' }}
+    <a href="{{ item.link.url }}">{{ item.link.title }}</a>
+  </div>
+</div>

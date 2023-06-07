@@ -1,0 +1,11 @@
+<div class="swiper">
+  <div class="swiper-wrapper">
+    {% for slide in item.slides %}
+      <div class="swiper-slide">
+        <img class="no-lazy" src="{{ Image(slide.image).src }}" alt="{{ Image(slide.image).src }}" />
+      </div>
+    {% endfor %}
+  </div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
+</div>

@@ -1,5 +1,9 @@
-jQuery( document ).ready( function( $ ) {
+// SwiperJS
+const swiper = new Swiper('.swiper', {
+  loop: true,
 
-  // Your JavaScript goes here
-
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
 });

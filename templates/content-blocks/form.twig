@@ -1,0 +1,14 @@
+<div>
+
+  {{ item.form_title ? '<h2>' ~ item.form_title ~ '</h2>' }}
+  {{ item.form_description ? '<div>' ~ item.form_description ~ '</div>' }}
+
+  {% filter shortcodes %}
+    [gravityforms title="false" description="false" ajax="true" tabindex="49" id={{ item.form_id }}]
+  {% endfilter %} 
+
+  {% if item.form_image %}
+    <img src="{{ Image(item.form_image).src() }}" alt="{{ Image(item.form_image).alt }}">
+  {% endif %}
+
+</div>

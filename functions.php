@@ -65,40 +65,72 @@ class StarterSite extends Timber\Site {
 		add_filter( 'timber/twig', array( $this, 'add_to_twig' ) );
 		add_action( 'init', array( $this, 'register_post_types' ) );
 		add_action( 'init', array( $this, 'register_taxonomies' ) );
-		parent::__construct();
 
-		// Enqueue assets
-		function stpeter_enqueue_assets() {
+    // Disable Gutenberg
+    add_filter('use_block_editor_for_post', '__return_false', 10);
+    function cw_deregister_styles() { wp_dequeue_style( 'wp-block-library' );}
+    add_action( 'wp_print_styles', 'cw_deregister_styles', 100 );    
+
+    // Enqueue assets
+		function cw_enqueue_assets() {
+
+			// Swiper
+			wp_enqueue_style( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css' );
+			wp_enqueue_script( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js', array (), 9.0, true);	
+
+			// Fonts
+			// wp_enqueue_style(
+			// 	'fonts',
+			// 	get_template_directory_uri() . '/static/fonts/fonts.css',
+			// 	false,
+			// 	filemtime(get_template_directory() . '/static/fonts/fonts.css')
+			// );
+      
+			// Site styles
+			wp_enqueue_style(
+				'styles',
+				get_template_directory_uri() . '/dist/style.css',
+				false,
+				filemtime(get_template_directory() . '/dist/style.css')
+			);
+
 			// Site scripts
-			wp_enqueue_script( 'js', get_template_directory_uri() . '/dist/main.js', array(), '1.0.0', true );			
+			wp_enqueue_script( 'js', get_template_directory_uri() . '/static/site.js', array(), '1.0.0', true );			
 		
 		}
-		add_action('wp_enqueue_scripts', 'stpeter_enqueue_assets');
+		add_action('wp_enqueue_scripts', 'cw_enqueue_assets');
 
-    // Custom image sizes
-    add_image_size( '1290x1140', 1290, 1140, true );
-    add_image_size( '645x570', 645, 570, true );
-    add_image_size( '700x740', 700, 740, true );  
-    add_image_size( '350x370', 350, 370, true );        
-    add_image_size( '2000w', 2000 );
-    
-    // Exercpt for Pages
-    add_post_type_support( 'page', 'excerpt' );
-
-    // Options page 
+    // ACF Options
     if( function_exists('acf_add_options_page') ) {
-      
-      acf_add_options_page(
-
-        array(
-          'page_title' => 'Options',
-          'menu_title' => 'Options',
-          'menu_slug' => 'options',
-          'capability' => 'edit_posts',
-          'redirect'		=> false
-        )
-      );	
+      acf_add_options_page();
     }
+
+    // Custom imges sizes
+		// add_image_size( '540x310', 540, 310, true );
+    // add_image_size( 'w1220', 1220 );
+
+    // Custom ACF toolbars
+    // https://www.advancedcustomfields.com/resources/customize-the-wysiwyg-toolbars
+    // ------------------------------------------------------------------
+    add_filter("acf/fields/wysiwyg/toolbars", "my_toolbars");
+    function my_toolbars($toolbars)
+    {
+      $toolbars["Very Simple"] = [];
+      $toolbars["Very Simple"][1] = ["bold", "italic", "link", "bullist", "numlist"];
+      return $toolbars;
+    }	  
+
+    // Exercpt for Pages
+    add_post_type_support( 'page', 'excerpt' ); 
+    
+		// Move Yoast to bottom
+		function yoasttobottom() {
+			return 'low';
+		}
+		add_filter( 'wpseo_metabox_prio', 'yoasttobottom');    
+
+		parent::__construct();
+    
 	}
 	/** This is where you can register custom post types. */
 	public function register_post_types() {
@@ -114,13 +146,28 @@ class StarterSite extends Timber\Site {
 	 * @param string $context context['this'] Being the Twig's {{ this }}.
 	 */
 	public function add_to_context( $context ) {
-		$context['foo']   = 'bar';
-		$context['stuff'] = 'I am a value set in your functions.php file';
-		$context['notes'] = 'These values are available everytime you call Timber::context();';
+		// $context['foo']   = 'bar';
+		// $context['stuff'] = 'I am a value set in your functions.php file';
+		// $context['notes'] = 'These values are available everytime you call Timber::context();';
 		$context['site']  = $this;
-    $context['primary_menu'] = new Timber\Menu('Primary Navigation');
-    $context['footer_menu'] = new Timber\Menu('Footer Navigation');
+    $context['menu'] = new Timber\Menu('Primary Navigation');
     $context['options'] = get_fields('option');
+    
+		// Loop for Offices
+		// $office_args = array(
+		// 	'post_type' => 'office',
+    //   'orderby' => 'menu_order',
+    //   'order' => 'ASC'
+		// );
+		// $context['offices_loop'] = Timber::get_posts($office_args);	
+
+		// Loop for Posts
+		// $latest_post_args = array(
+		// 	'post_type' => 'post',
+		// 	'posts_per_page' => 6,
+		// );
+		// $context['latest_posts_loop'] = Timber::get_posts($latest_post_args);	
+
 		return $context;
 	}
 
@@ -164,10 +211,10 @@ class StarterSite extends Timber\Site {
 	 *
 	 * @param string $text being 'foo', then returned 'foo bar!'.
 	 */
-	public function myfoo( $text ) {
-		$text .= ' bar!';
-		return $text;
-	}
+	// public function myfoo( $text ) {
+	// 	$text .= ' bar!';
+	// 	return $text;
+	// }
 
 	/** This is where you can add your own functions to twig.
 	 *
@@ -175,38 +222,10 @@ class StarterSite extends Timber\Site {
 	 */
 	public function add_to_twig( $twig ) {
 		$twig->addExtension( new Twig\Extension\StringLoaderExtension() );
-		$twig->addFilter( new Twig\TwigFilter( 'myfoo', array( $this, 'myfoo' ) ) );
+		// $twig->addFilter( new Twig\TwigFilter( 'myfoo', array( $this, 'myfoo' ) ) );
 		return $twig;
 	}
 
 }
 
 new StarterSite();
-
-// add_filter( 'timber_context', 'mytheme_timber_context'  );
-
-// function mytheme_timber_context( $context ) {
-//     $context['options'] = get_fields('option');
-//     return $context;
-// }
-
-//Custom Navigation Menu
-// function wpb_custom_new_menu() {
-//   register_nav_menus(
-//     array(
-//       'main-navigation' => __( 'Main Navigation' ),
-//       'footer-navigation' => __( 'Footer Navigation' )
-//     )
-//   );
-// }
-// add_action( 'init', 'wpb_custom_new_menu' );
-
-// add_filter( 'timber/context', 'add_to_context' );
-
-
-// function add_to_context( $context ) {
-// 	$context['main-navigation']  = new Timber\Menu('Main Navigation');
-// 	$context['footer-navigation'] = new Timber\Menu('Footer Navigation');
-// 	// ...
-// 	return $context;
-// }

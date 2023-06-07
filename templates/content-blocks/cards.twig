@@ -1,0 +1,20 @@
+{{ item.title ? '<h2>' ~ item.title ~ '</h2>' }}
+
+<div>
+  {% for card in item.cards_group %}
+    <div>
+      {% set image = card.image ? Image(card.image) : '' %}
+      {{ image ? '<img src="' ~ image.src() ~ '" alt="' ~ image.alt ~ '">' }}
+
+      {{ card.subtitle ? '<span>' ~ card.subtitle ~ '</span>' }}
+
+      {{ card.title ? '<h3>' ~ card.title ~ '</h3>' }}
+
+      {{ card.text ? '<p>' ~ card.text ~ '</p>' }}
+
+      {% set url = card.link.url ? card.link.url : '' %}
+      {% set title = card.link.title ? card.link.title : 'Read more' %}
+      {{ url ? '<a href="' ~ url ~ '">' ~ title ~ '</a>' }}
+    </div>
+  {% endfor %}
+</div>

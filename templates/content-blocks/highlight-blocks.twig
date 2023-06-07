@@ -1,0 +1,16 @@
+{% set highlightCount = item.blocks|length %}
+
+<div class="grid grid-cols-1 {{ highlightCount > 1 ? 'sm:grid-cols-2' : 'sm:grid-cols-1' }} {{ highlightCount > 2 ? 'md:grid-cols-3' : 'md:grid-cols-2' }} {{ highlightCount > 3 ? 'lg:grid-cols-4' : 'lg:grid-cols-3' }} gap-4">
+  {% for highlight in item.blocks %}
+
+    <div>
+      <img src="{{ Image(highlight.image).src() }}" alt="{{ Image(highlight.image).alt }}">
+      {{ highlight.title ? '<h2>' ~ highlight.title ~ '</h2>' }}
+      {{ highlight.text ? '<p>' ~ highlight.text ~ '</p>' }}
+      {% set url = highlight.link.url ? highlight.link.url : '' %}
+      {% set title = highlight.link.title ? highlight.link.title : 'Read more' %}
+      {{ url ? '<a href="' ~ url ~ '">' ~ title ~ '</a>' }}      
+    </div>
+
+  {% endfor %}
+</div>
