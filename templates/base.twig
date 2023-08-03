@@ -14,9 +14,50 @@
 					<h1 role="banner">
 						<a href="{{site.url}}" rel="home">{{site.name}}</a>
 					</h1>
-					<nav role="navigation">
-						{% include "menu.twig" with {'items': menu.get_items} %}
-					</nav><!-- #nav -->
+
+          {# Nav for large screens #}
+          <nav aria-label="Main" class="hidden lg:flex lg:ml-auto" role="navigation">
+            <ul role="menubar" class="flex items-center">
+              {% include "menu.twig" with {'items': menu.get_items} %}
+              <li role="none">
+                <a role="menuitem" href="/contact/">Contact us</a>
+              </li>
+            </ul>
+          </nav>
+
+          {# Nav for small screens #}
+          <div x-data="{ open: false }" @keydown.window.escape="open = false" @keydown.window.enter="open = true"
+            x-init="$watch('open', value => { 
+              if (value) { 
+                  document.body.style.overflow = 'hidden';
+              } else { 
+                  document.body.style.overflow = '';
+              }})">
+            {# Open #}
+            <button aria-label="Open navigation" @click="open = true" x-show="!open" x-cloak class="lg:hidden fixed top-0 right-0 z-50">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
+                <path fill-rule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            {# Nav #}
+            <nav aria-label="Mobile" role="navigation" class="lg:hidden">
+              <ul role="menubar" class="text-lg fixed inset-0 z-50 flex flex-col items-center justify-center space-y-4 bg-white" :class="{'hidden': !open, 'flex': open}">
+                <li role="none" x-show="open" class="mb-6">
+                  Logo
+                </li>                            
+                {% include "menu.twig" with {'items': menu.get_items} %}
+                <li role="none">
+                  <a role="menuitem" href="/contact/">Contact us</a>
+                </li>
+              </ul>
+            </nav>
+            {# Close #}
+            <button aria-label="Close navigation" @click="open = false" x-show="open" x-cloak class="lg:hidden fixed top-5 right-5 z-50">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10">
+                <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
 				</div>
 			{% endblock %}
 		</header>
